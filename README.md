@@ -3,7 +3,7 @@
 This tutorial shows how to create a VS Code extension that opens a custom webview powered by:
 
 - **Vue** for the webview UI
-- **Vite** for fast frontend builds
+- **Vite** for fast frontend builds. Supports Vue 3.4
 - **Tailwind CSS** for layout and custom styling
 - **VS Code CSS theme variables** for native-looking controls
 - **VS Code Webview API** for rendering the UI inside VS Code
@@ -258,24 +258,18 @@ Create `webview-ui/src/components/VSCodeTextField.vue`:
 
 ```vue
 <script setup lang="ts">
-defineProps<{
-  modelValue: string;
-  placeholder?: string;
-}>();
+const fieldValue = defineModel<string>({ required: true });
 
-defineEmits<{
-  "update:modelValue": [value: string];
+defineProps<{
+  placeholder?: string;
 }>();
 </script>
 
 <template>
   <input
-    :value="modelValue"
+    v-model="fieldValue"
     :placeholder="placeholder"
     class="w-full rounded border border-[var(--vscode-input-border)] bg-[var(--vscode-input-background)] px-3 py-2 text-sm text-[var(--vscode-input-foreground)] placeholder:text-[var(--vscode-input-placeholderForeground)] focus:outline focus:outline-1 focus:outline-[var(--vscode-focusBorder)]"
-    @input="
-      $emit('update:modelValue', ($event.target as HTMLInputElement).value)
-    "
   />
 </template>
 ```
@@ -284,24 +278,18 @@ Create `webview-ui/src/components/VSCodeTextArea.vue`:
 
 ```vue
 <script setup lang="ts">
-defineProps<{
-  modelValue: string;
-  placeholder?: string;
-}>();
+const textValue = defineModel<string>({ required: true });
 
-defineEmits<{
-  "update:modelValue": [value: string];
+defineProps<{
+  placeholder?: string;
 }>();
 </script>
 
 <template>
   <textarea
-    :value="modelValue"
+    v-model="textValue"
     :placeholder="placeholder"
     class="min-h-24 w-full rounded border border-[var(--vscode-input-border)] bg-[var(--vscode-input-background)] px-3 py-2 text-sm text-[var(--vscode-input-foreground)] placeholder:text-[var(--vscode-input-placeholderForeground)] focus:outline focus:outline-1 focus:outline-[var(--vscode-focusBorder)]"
-    @input="
-      $emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)
-    "
   />
 </template>
 ```
@@ -702,6 +690,20 @@ From inside `webview-ui`, run:
 ```bash
 npm run build
 ```
+
+A current Vite Vue TypeScript project usually uses this build script in `webview-ui/package.json`:
+
+```json
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  }
+}
+```
+
+`vue-tsc -b` type-checks Vue single-file components, and `vite build` creates the webview bundle.
 
 Vite creates:
 
